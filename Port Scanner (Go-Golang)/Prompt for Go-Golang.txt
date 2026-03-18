@@ -1,0 +1,15 @@
+Prompt for Go (Golang):
+
+"I want to build a highly concurrent and fast TCP port scanner in Go (Golang) for my cybersecurity portfolio. Please write the scanner in a new folder called Go and use native packages.
+
+The code must include the following iterative features:
+
+Version 1.0 (Core): Use the net package for basic TCP connection scanning.
+Version 2.0 (Speed): Utilize goroutines, channels, and a wait group to create a high-performance worker pool for scanning.
+Version 3.0 (Usability): Use the flag package to create a robust Command Line Interface (CLI) allowing the user to specify custom targets, port ranges, concurrency levels (threads), and timeouts.
+Version 4.0 (Advanced): Implement basic Service Banner Grabbing. When an open port is discovered, send a payload to capture and print the service identity.
+Please generate the main main.go. In addition, create a professional 
+
+README.md
+ (with usage instructions like cd and a quickstart example) and generate the go.mod file."
+

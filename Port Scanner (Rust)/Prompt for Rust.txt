@@ -1,0 +1,14 @@
+Prompt for Rust:
+
+"I want to build a safe, low-level, and incredibly fast TCP port scanner in Rust for my cybersecurity portfolio. Please write the scanner in a new folder called Rust.
+
+The code must include the following iterative features:
+
+Version 1.0 (Core): Use standard Rust std::net::TcpStream for basic connection scanning.
+Version 2.0 (Speed): Introduce high concurrency using standard thread spawning or the tokio runtime to safely and rapidly scan massive ranges of ports.
+Version 3.0 (Usability): Use the clap crate to create a strong Command Line Interface (CLI) to specify target IP/hostnames, port lists/ranges, worker limits, and configurable timeouts.
+Version 4.0 (Advanced): Implement basic TCP Service Banner Grabbing. When a port is open, negotiate a small read to grab the service signature.
+Please generate the main Rust source files. Also draft a professional 
+
+README.md
+ (with directory navigation instructions and quickstart examples) and generate the required Cargo.toml file."

@@ -1,0 +1,6 @@
+# No external dependencies required!
+# This project purely utilizes Python standard libraries:
+# - socket
+# - threading / concurrent.futures
+# - argparse
+# - time / datetime / sys

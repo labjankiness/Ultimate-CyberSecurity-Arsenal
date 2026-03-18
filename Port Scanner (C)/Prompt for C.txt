@@ -1,0 +1,16 @@
+Prompt for C:
+
+"I want to build a bare-metal, low-level TCP port scanner in C for my cybersecurity portfolio. Please write it in a new folder called C.
+
+The code must include the following iterative features:
+
+Version 1.0 (Core): Use standard POSIX sockets (sys/socket.h) for core TCP connectivity to the target.
+Version 2.0 (Speed): Use pthreads to add multi-threading concurrency so the scanner can validate open ports much faster.
+Version 3.0 (Usability): Parse standard argc/argv arguments (or use getopt) to allow the user to define the target IP, port range, concurrent thread limits, and socket timeouts via the CLI.
+Version 4.0 (Advanced): Implement bare-metal Service Banner Grabbing. Send a generic byte array over the open socket and recv() the response to identify the connected service.
+Please generate the main .c source file. Also, please generate a Makefile for compilation and a professional 
+
+README.md
+ detailing the build process and usage instructions."
+
+

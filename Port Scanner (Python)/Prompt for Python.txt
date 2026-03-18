@@ -1,0 +1,20 @@
+Prompt for Python Port Scanner:
+
+"I want to build a highly concurrent and fast TCP port scanner in Python for my cybersecurity portfolio. Please write the scanner in a new folder called Python and ensure it uses only Python standard libraries (no external dependencies).
+
+The script must include the following iterative features:
+
+Version 1.0 (Core): Use the socket library for basic TCP connection scanning.
+Version 2.0 (Speed): Use concurrent.futures.ThreadPoolExecutor to create a worker pool of threads for maximum concurrency and fast scanning across massive port ranges.
+Version 3.0 (Usability): Use the argparse library to create a robust Command Line Interface (CLI). The user should be able to specify a target hostname/IP, a custom port range (e.g., 1-1000 or 22,80,443), custom thread counts, and timeout configurations.
+Version 4.0 (Advanced): Implement basic Service Banner Grabbing. When an open port is discovered, the script should attempt to send a generic payload (like an HTTP GET request) and listen for a response to identify the service running behind that port.
+Please generate the main 
+
+port_scanner.py
+ file. In addition, please draft a professional 
+
+README.md
+ that explains the features, provides installation steps, and includes an explicit Usage section showing how to navigate to the directory (e.g., cd "l:\Vibe Coding Project\CyberSecurity Portfolio\Port Scanner\Python") and run a quickstart command. Finally, create a 
+
+requirements.txt
+ file that explicitly states no external libraries are required."
