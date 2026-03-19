@@ -1,0 +1,11 @@
+[package]
+name = "packet-sniffer"
+version = "0.1.0"
+edition = "2024"
+description = "A lightweight CLI packet sniffer for network traffic analysis"
+
+[dependencies]
+pnet = "0.35"
+clap = { version = "4", features = ["derive"] }
+chrono = "0.4"
+colored = "2"
