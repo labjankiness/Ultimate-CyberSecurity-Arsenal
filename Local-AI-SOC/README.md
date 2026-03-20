@@ -1,8 +1,8 @@
 # AI-SOC: Autonomous SIEM Alert Triage Agent
 
-An AI-powered Security Operations Center (SOC) assistant that uses a locally hosted LLM to triage security alerts in real time — reducing alert fatigue by automating first-pass investigation of SIEM log data. Includes a **live web dashboard** for monitoring alerts in the browser.
+An AI-powered Security Operations Center (SOC) assistant that uses a locally hosted LLM to triage security alerts in real time — reducing alert fatigue by automating first-pass investigation of SIEM log data. Features **structured JSON output**, **SQLite persistence**, **MITRE ATT&CK mapping**, **threat intelligence enrichment**, and both a live web dashboard and a Streamlit analytics dashboard.
 
-> **The Problem:** SOC analysts spend ~80% of their time investigating false positives. This project builds an autonomous triage agent that sits between raw security logs and the analyst, providing instant threat classification, severity scoring, and remediation guidance.
+> **The Problem:** SOC analysts spend ~80% of their time investigating false positives. This project builds an autonomous triage agent that sits between raw security logs and the analyst, providing instant threat classification, severity scoring, IOC extraction, MITRE technique mapping, and remediation guidance.
 
 ---
 
@@ -10,18 +10,15 @@ An AI-powered Security Operations Center (SOC) assistant that uses a locally hos
 
 ```
 [*] Monitoring mock_security.log for threats...
-[*] Dashboard running at http://localhost:5050
+[*] Alerts stored in soc_alerts.db
 
 [!] New Alert Detected. Consulting AI...
-
---- AI TRIAGE REPORT ---
-VERDICT: True Positive
-THREAT LEVEL: 8/10
-SUMMARY: Brute-force SSH login attempt targeting the root account from an
-         external IP. Multiple failed authentication attempts indicate
-         credential stuffing or dictionary attack.
-REMEDIATION: Block source IP 192.168.1.50 at the firewall and enforce
-             key-based SSH authentication.
+[+] Alert #12 stored in database.
+    Verdict:  True Positive
+    Severity: 8/10 [CRITICAL]
+    Category: SSH Brute Force
+    Summary:  Brute-force SSH login attempt targeting root from external IP
+              203.0.113.5. Multiple failed authentication attempts detected.
 ```
 
 ---
@@ -34,18 +31,27 @@ REMEDIATION: Block source IP 192.168.1.50 at the firewall and enforce
 │  (Log Generator)  │     │  (File Monitor)  │     │ (LLM via Ollama) │
 └──────────────────┘     └────────┬─────────┘     └────────┬─────────┘
                                   │                         │
-                                  v                         v
-                         ┌──────────────────┐     ┌──────────────────┐
-                         │    dashboard.py   │     │ threat_dashboard  │
-                         │ (Web UI :5050)    │     │    (.md report)   │
-                         └──────────────────┘     └──────────────────┘
+                          ┌───────┴───────┐         ┌───────┴───────┐
+                          │               │         │               │
+                          v               v         v               v
+                   ┌────────────┐  ┌────────────┐  ┌────────────┐  ┌────────────┐
+                   │ dashboard  │  │ soc_dash   │  │  mitre     │  │threat_intel│
+                   │ (HTTP:5050)│  │ (Streamlit)│  │  mapping   │  │(enrichment)│
+                   └────────────┘  └────────────┘  └────────────┘  └────────────┘
+                                          │
+                                          v
+                                   ┌────────────┐
+                                   │  database  │
+                                   │  (SQLite)  │
+                                   └────────────┘
 ```
 
 1. **Ingestion** — `log_watcher.py` tail-follows a log file for new entries.
-2. **Orchestration** — `triage_agent.py` extracts metadata (IP, user, command) and constructs a structured prompt.
-3. **Inference** — A local Llama 3.1 model (via Ollama) analyzes intent using a Senior SOC Analyst system prompt.
-4. **Reporting** — Results are appended to `threat_dashboard.md` and pushed to the live web dashboard.
-5. **Dashboard** — `dashboard.py` serves a live-updating HTML dashboard at `http://localhost:5050` with alert cards, severity counts, and auto-refresh.
+2. **Enrichment** — `threat_intel.py` checks IOCs against local threat feed and AbuseIPDB (optional).
+3. **Inference** — `triage_agent.py` sends the enriched log to Ollama, forcing structured JSON output with validation and retry.
+4. **MITRE Mapping** — `mitre_mapping.py` tags each alert with the corresponding ATT&CK technique ID and tactic.
+5. **Storage** — `database.py` persists everything in SQLite (`soc_alerts.db`).
+6. **Dashboards** — Live HTTP dashboard at `:5050` and Streamlit analytics dashboard with charts, filters, and MITRE heatmap.
 
 ---
 
@@ -63,15 +69,66 @@ This project uses **Ollama** to run inference entirely on-device. Security logs 
 
 ```
 Local-AI-SOC/
-├── triage_agent.py        # Core LLM orchestration and prompt engineering
-├── log_watcher.py         # Real-time log file monitor (with dashboard callback)
-├── simulate_attack.py     # Severity-weighted attack generator (SSH, SQLi, privesc, USB)
+├── triage_agent.py        # LLM orchestration — structured JSON output with validation
+├── log_watcher.py         # Real-time log monitor → SQLite + dashboards
+├── simulate_attack.py     # Severity-weighted attack generator (6 attack types)
 ├── dashboard.py           # Live web dashboard (localhost:5050)
-├── requirements.txt       # Python dependency: requests
-├── threat_dashboard.md    # Auto-generated triage report (created at runtime)
-├── mock_security.log      # Simulated SIEM feed (created at runtime)
+├── soc_dashboard.py       # Streamlit analytics dashboard with charts and filters
+├── database.py            # SQLite backend (alerts table with MITRE + enrichment columns)
+├── mitre_mapping.py       # Local MITRE ATT&CK technique lookup (9 techniques)
+├── threat_intel.py        # Threat intel enrichment (AbuseIPDB + local feed)
+├── config.py              # Environment-based configuration (.env support)
+├── known_threats.json     # Local threat feed (20 IPs, 10 user agents, 10 signatures)
+├── .env.example           # Template for API keys and settings
+├── .gitignore             # Excludes .env, database, logs, pycache
+├── requirements.txt       # Dependencies: requests, streamlit, plotly, pandas
 └── README.md
 ```
+
+---
+
+## Features
+
+### Structured JSON Triage
+The LLM returns validated JSON for every alert:
+```json
+{
+  "verdict": "True Positive",
+  "threat_level": 8,
+  "category": "SSH Brute Force",
+  "summary": "Brute-force SSH login attempt targeting root.",
+  "remediation": "Block source IP at firewall, enforce key-based auth.",
+  "iocs": { "source_ip": "203.0.113.5", "username": "root", "command": null }
+}
+```
+
+### MITRE ATT&CK Mapping
+Every alert is tagged with the corresponding MITRE technique:
+
+| Category | Technique | Tactic |
+|:---|:---|:---|
+| SSH Brute Force | T1110.001 — Password Guessing | Credential Access |
+| Privilege Escalation | T1548.003 — Sudo Abuse | Privilege Escalation |
+| SQL Injection | T1190 — Exploit Public-Facing App | Initial Access |
+| Port Scan | T1046 — Network Service Scanning | Discovery |
+| Rogue USB | T1091 — Removable Media | Lateral Movement |
+| Reconnaissance | T1595 — Active Scanning | Reconnaissance |
+
+### Threat Intelligence Enrichment
+- **Local threat feed** (always available offline): 20 known-malicious IPs, 10 attack signatures
+- **AbuseIPDB** (optional, free tier): IP reputation scores, abuse confidence, report counts
+- Enrichment context is injected into the LLM prompt for better-informed verdicts
+
+### Streamlit Analytics Dashboard
+Run `streamlit run soc_dashboard.py` for:
+- Metric cards (Total Alerts, True Positives, False Positives, Avg Threat Level)
+- Threat level distribution bar chart (color-coded by severity)
+- Category breakdown donut chart
+- Alerts-over-time area chart
+- MITRE ATT&CK technique treemap heatmap
+- Filterable alert feed with expandable details (IOCs, MITRE info, remediation)
+- Sidebar filters: threat level, verdict, category, IP search
+- Auto-refresh toggle (5-second polling)
 
 ---
 
@@ -79,51 +136,35 @@ Local-AI-SOC/
 
 - **Python** 3.10+
 - **Ollama** — [Install here](https://ollama.com/)
-- **Hardware** — Any machine with 8GB+ RAM. A dedicated GPU (e.g., NVIDIA RTX series) significantly improves inference speed but is not required.
-
-Pull the model:
+- **Hardware** — Any machine with 8GB+ RAM. A dedicated GPU significantly improves inference speed but is not required.
 
 ```bash
 ollama pull llama3.1:8b
-```
-
-Install the Python dependency:
-
-```bash
 pip install -r requirements.txt
 ```
+
+Optional — copy `.env.example` to `.env` and add your AbuseIPDB API key for threat intel enrichment.
 
 ---
 
 ## Quick Start
 
-You'll need **two terminal windows** running simultaneously.
-
 **Terminal 1 — Start the attack simulator:**
-
 ```bash
 python simulate_attack.py
 ```
 
-This writes severity-weighted synthetic alerts to `mock_security.log` at randomized intervals. Attack types include failed SSH logins (high), suspicious sudo commands (high), SQL injection attempts (high), port scans (medium), rogue USB devices (medium), and failed sudo attempts (low).
-
 **Terminal 2 — Start the log watcher:**
-
 ```bash
 python log_watcher.py
 ```
 
-This tail-follows the log file, sends each new entry to the local LLM for analysis, and automatically starts the web dashboard at `http://localhost:5050`. Triage reports are printed to the console and appended to `threat_dashboard.md`.
+**Terminal 3 (optional) — Start the Streamlit dashboard:**
+```bash
+streamlit run soc_dashboard.py
+```
 
----
-
-## Web Dashboard
-
-Open `http://localhost:5050` in your browser to see:
-- **Total Alerts** count
-- **Severity breakdown** (High / Medium / Low)
-- **Alert cards** with timestamp, raw log, verdict, and severity badge
-- **Auto-refresh** every 10 seconds
+The live web dashboard also starts automatically at `http://localhost:5050` when running `log_watcher.py`.
 
 ---
 
@@ -140,31 +181,16 @@ Open `http://localhost:5050` in your browser to see:
 
 ---
 
-## Customization
-
-**Swap the model** — Edit `MODEL` in `triage_agent.py`:
-
-```python
-MODEL = "llama3.1:8b"           # Default
-MODEL = "mistral:7b"            # Alternative
-MODEL = "mranv/siem-llama-3.1"  # Security-tuned variant
-```
-
-**Adjust alert frequency** — Change the sleep intervals in `simulate_attack.py`.
-
-**Add custom attack patterns** — Extend the attack lists in `simulate_attack.py` with your own log formats and severity weights.
-
----
-
 ## Tech Stack
 
 | Component | Technology |
 |:---|:---|
 | Language | Python 3.10+ |
 | AI Engine | [Ollama](https://ollama.com/) — Llama 3.1 8B |
-| Inference | Local GPU / CPU |
-| Dashboard | Built-in Python HTTP server |
-| Architecture | File-based log streaming with LLM orchestration |
+| Database | SQLite (soc_alerts.db) |
+| Dashboards | Built-in HTTP server + Streamlit + Plotly |
+| Threat Intel | AbuseIPDB (optional) + local threat feed |
+| Framework | MITRE ATT&CK technique mapping |
 
 ---
 
