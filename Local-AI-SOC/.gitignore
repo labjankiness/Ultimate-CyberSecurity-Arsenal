@@ -1,0 +1,6 @@
+.env
+soc_alerts.db
+mock_security.log
+threat_dashboard.md
+__pycache__/
+*.pyc

@@ -1,1 +1,4 @@
 requests
+streamlit
+plotly
+pandas

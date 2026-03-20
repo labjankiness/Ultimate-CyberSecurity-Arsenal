@@ -1,0 +1,48 @@
+{
+  "malicious_ips": [
+    {"ip": "203.0.113.5", "type": "scanner", "description": "Known port scanner / brute force source"},
+    {"ip": "203.0.113.10", "type": "c2", "description": "Known C2 server"},
+    {"ip": "203.0.113.42", "type": "scanner", "description": "Aggressive SSH brute force source"},
+    {"ip": "198.51.100.23", "type": "scanner", "description": "Mass scanning infrastructure"},
+    {"ip": "198.51.100.50", "type": "malware", "description": "Malware distribution server"},
+    {"ip": "198.51.100.99", "type": "c2", "description": "Cobalt Strike C2 beacon"},
+    {"ip": "192.0.2.100", "type": "tor_exit", "description": "Tor exit node"},
+    {"ip": "192.0.2.101", "type": "tor_exit", "description": "Tor exit node"},
+    {"ip": "192.0.2.102", "type": "tor_exit", "description": "Tor exit node"},
+    {"ip": "192.0.2.200", "type": "vpn", "description": "Known VPN endpoint used by threat actors"},
+    {"ip": "45.33.32.156", "type": "scanner", "description": "Shodan scanner IP"},
+    {"ip": "71.6.167.142", "type": "scanner", "description": "Censys scanner IP"},
+    {"ip": "185.220.101.1", "type": "tor_exit", "description": "Tor exit node (DE)"},
+    {"ip": "185.220.101.2", "type": "tor_exit", "description": "Tor exit node (DE)"},
+    {"ip": "89.248.167.131", "type": "scanner", "description": "Recyber scanner"},
+    {"ip": "162.142.125.1", "type": "scanner", "description": "Censys scanner"},
+    {"ip": "167.94.138.1", "type": "scanner", "description": "Censys scanner"},
+    {"ip": "5.188.210.101", "type": "brute_force", "description": "SSH brute force botnet"},
+    {"ip": "5.188.210.102", "type": "brute_force", "description": "SSH brute force botnet"},
+    {"ip": "194.26.29.120", "type": "c2", "description": "Known RAT C2 server"}
+  ],
+  "suspicious_user_agents": [
+    "sqlmap",
+    "nikto",
+    "nmap",
+    "masscan",
+    "zgrab",
+    "gobuster",
+    "dirbuster",
+    "hydra",
+    "medusa",
+    "wpscan"
+  ],
+  "attack_signatures": [
+    {"pattern": "OR '1'='1'", "type": "sqli", "description": "Classic SQL injection"},
+    {"pattern": "UNION SELECT", "type": "sqli", "description": "UNION-based SQL injection"},
+    {"pattern": "/etc/shadow", "type": "privesc", "description": "Shadow file access attempt"},
+    {"pattern": "/etc/passwd", "type": "recon", "description": "Password file enumeration"},
+    {"pattern": "reverse_tcp", "type": "c2", "description": "Reverse TCP shell"},
+    {"pattern": "Rubber Ducky", "type": "physical", "description": "USB attack device"},
+    {"pattern": "Failed password.*attempt", "type": "brute_force", "description": "Brute force SSH"},
+    {"pattern": "base64 -d", "type": "evasion", "description": "Base64 encoded command execution"},
+    {"pattern": "nc -e /bin/sh", "type": "c2", "description": "Netcat reverse shell"},
+    {"pattern": "wget.*sh|curl.*sh", "type": "malware", "description": "Remote script download and execute"}
+  ]
+}
