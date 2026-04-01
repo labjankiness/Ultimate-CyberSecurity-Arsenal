@@ -1,0 +1,73 @@
+From: Accounts Payable <billing@secure-login-update.com>
+Reply-To: payment@credential-harvest.com
+To: finance@example.com
+Subject: INVOICE #INV-2026-4891 - Payment Overdue - Immediate Action Required
+Date: Fri, 28 Mar 2026 14:30:00 +0000
+Message-ID: <inv4891@secure-login-update.com>
+MIME-Version: 1.0
+Content-Type: multipart/alternative; boundary="----=_Part_invoice"
+Authentication-Results: mx.example.com; spf=softfail; dkim=none; dmarc=fail
+Received: from mail.secure-login-update.com (unknown [91.215.85.40])
+	by mx.example.com (Postfix) with SMTP id 1F3C89;
+	Fri, 28 Mar 2026 14:30:02 +0000
+
+------=_Part_invoice
+Content-Type: text/plain; charset="utf-8"
+
+URGENT: Payment Overdue
+
+Invoice #INV-2026-4891
+Amount Due: $4,891.00
+Due Date: March 25, 2026 (PAST DUE)
+
+Dear Accounts Payable,
+
+This is a final reminder that the above invoice is now overdue.
+Please process payment immediately to avoid service disruption
+and late fees.
+
+To view and pay this invoice, click below:
+http://secure-login-update.com/invoice/pay?id=4891&company=example
+
+If payment is not received by end of business today, we will be
+forced to escalate this matter to our collections department and
+suspend your account.
+
+Wire transfer details are also available at the link above.
+
+Best regards,
+Sarah Mitchell
+Senior Accounts Manager
+Global Business Services Ltd.
+
+------=_Part_invoice
+Content-Type: text/html; charset="utf-8"
+
+<html>
+<body style="font-family: Arial, sans-serif; padding: 20px;">
+<div style="max-width: 600px; margin: 0 auto; border: 2px solid #d32f2f; padding: 20px;">
+<h1 style="color: #d32f2f;">PAYMENT OVERDUE</h1>
+<table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
+<tr style="background: #f5f5f5;"><td style="padding: 8px;"><strong>Invoice #</strong></td><td>INV-2026-4891</td></tr>
+<tr><td style="padding: 8px;"><strong>Amount Due</strong></td><td style="color: #d32f2f; font-size: 20px;"><strong>$4,891.00</strong></td></tr>
+<tr style="background: #f5f5f5;"><td style="padding: 8px;"><strong>Due Date</strong></td><td>March 25, 2026 (PAST DUE)</td></tr>
+</table>
+<p>Dear Accounts Payable,</p>
+<p>This is a <strong>final reminder</strong> that the above invoice is now overdue.</p>
+<p style="text-align: center; margin: 25px 0;">
+<a href="http://secure-login-update.com/invoice/pay?id=4891&company=example"
+   style="background: #d32f2f; color: white; padding: 14px 35px; text-decoration: none; border-radius: 4px; font-size: 18px;">
+   Pay Invoice Now
+</a>
+</p>
+<p style="color: #d32f2f;"><strong>If payment is not received by end of business today,</strong>
+we will escalate to collections and suspend your account.</p>
+<p>Wire transfer details available at the link above.</p>
+<hr>
+<p style="font-size: 11px; color: #888;">Sarah Mitchell | Senior Accounts Manager<br>
+Global Business Services Ltd.</p>
+</div>
+</body>
+</html>
+
+------=_Part_invoice--

@@ -1,0 +1,63 @@
+From: Dev Weekly <newsletter@devweekly.io>
+To: subscriber@example.com
+Subject: Dev Weekly #142 - Rust 2026 Edition, WebGPU lands in Firefox
+Date: Sun, 29 Mar 2026 08:00:00 +0000
+Message-ID: <newsletter-142-20260329@devweekly.io>
+MIME-Version: 1.0
+Content-Type: multipart/alternative; boundary="----=_Part_142_newsletter"
+Authentication-Results: mx.example.com; spf=pass; dkim=pass; dmarc=pass
+Received: from smtp.devweekly.io (smtp.devweekly.io [93.184.216.34])
+	by mx.example.com (Postfix) with ESMTPS id DEF456;
+	Sun, 29 Mar 2026 08:00:01 +0000
+List-Unsubscribe: <mailto:unsubscribe@devweekly.io>
+
+------=_Part_142_newsletter
+Content-Type: text/plain; charset="utf-8"
+
+Dev Weekly #142
+
+Top Stories This Week:
+
+1. Rust 2026 Edition Released
+The Rust team announced the 2026 edition with async closures,
+improved compile times, and a new borrow checker algorithm.
+
+2. WebGPU Lands in Firefox Stable
+Firefox 135 ships with full WebGPU support, completing the
+cross-browser availability of the next-gen graphics API.
+
+3. Python 3.15 Beta Available
+Notable features include pattern matching guards, improved
+error messages, and the new `defer` statement.
+
+Read more at https://devweekly.io/issue/142
+
+You're receiving this because you subscribed at devweekly.io.
+Unsubscribe: https://devweekly.io/unsubscribe
+
+------=_Part_142_newsletter
+Content-Type: text/html; charset="utf-8"
+
+<html>
+<body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+<h1>Dev Weekly #142</h1>
+<h2>Top Stories This Week</h2>
+<h3>1. Rust 2026 Edition Released</h3>
+<p>The Rust team announced the 2026 edition with async closures,
+improved compile times, and a new borrow checker algorithm.</p>
+<h3>2. WebGPU Lands in Firefox Stable</h3>
+<p>Firefox 135 ships with full WebGPU support, completing the
+cross-browser availability of the next-gen graphics API.</p>
+<h3>3. Python 3.15 Beta Available</h3>
+<p>Notable features include pattern matching guards, improved
+error messages, and the new <code>defer</code> statement.</p>
+<p><a href="https://devweekly.io/issue/142">Read the full issue</a></p>
+<hr>
+<p style="font-size: 12px; color: #666;">
+You're receiving this because you subscribed at devweekly.io.<br>
+<a href="https://devweekly.io/unsubscribe">Unsubscribe</a>
+</p>
+</body>
+</html>
+
+------=_Part_142_newsletter--

@@ -14,7 +14,8 @@ import threading
 from typing import Optional, Callable
 
 from triage_agent import analyze_log
-from database import init_db, store_alert
+from database import init_db, store_alert, store_responses
+from response_engine import generate_response
 
 LOG_FILE = "mock_security.log"
 
@@ -60,6 +61,24 @@ def watch_logs(dashboard_callback: Optional[Callable] = None) -> None:
             print(f"    Severity: {alert['threat_level']}/10 [{severity_color}]")
             print(f"    Category: {alert['category']}")
             print(f"    Summary:  {alert['summary']}")
+
+            # Correlation context
+            if alert.get("is_correlated"):
+                corr_id = alert.get("correlation_id", "N/A")
+                stage = alert.get("chain_stage", "N/A")
+                narrative = alert.get("correlation_narrative", "")
+                print(f"    [CORRELATED] Incident: {corr_id} | Stage: {stage}")
+                if narrative:
+                    print(f"    [CORRELATED] {narrative}")
+
+            # Generate and store response suggestions
+            suggestions = generate_response(alert)
+            if suggestions:
+                store_responses(row_id, suggestions)
+                print(f"    [RESPONSE] {len(suggestions)} suggested action(s):")
+                for s in suggestions:
+                    risk_tag = s["risk_level"].upper()
+                    print(f"      [{risk_tag}] {s['action_name']}")
 
             # Markdown dashboard (secondary output)
             with open("threat_dashboard.md", "a") as dashboard:

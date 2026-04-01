@@ -17,6 +17,7 @@ import requests
 from typing import Optional
 from mitre_mapping import get_mitre_mapping
 from threat_intel import enrich_alert
+from correlator import correlate
 
 
 # Local Ollama endpoint
@@ -197,9 +198,20 @@ def analyze_log(log_entry: str, max_retries: int = 1) -> dict:
         if enrichment_data.get("is_known_malicious"):
             enrichment_ctx += " [KNOWN MALICIOUS]"
 
+    # Pre-correlate for prompt context (uses raw IOCs before LLM categorization)
+    pre_corr = correlate({
+        "source_ip": pre_alert["iocs"].get("source_ip"),
+        "category": "Other",  # unknown yet, will be set after LLM
+        "timestamp": time.strftime("%Y-%m-%d %H:%M:%S"),
+    })
+    correlation_ctx = ""
+    if pre_corr.get("is_correlated") and pre_corr.get("narrative"):
+        prefix = "CRITICAL CONTEXT: " if pre_corr.get("escalated_severity", 0) >= 8 else ""
+        correlation_ctx = f"\n\nCORRELATION: {prefix}{pre_corr['narrative']}"
+
     payload = {
         "model": MODEL,
-        "prompt": f"{SYSTEM_PROMPT}\n\nLOG DATA: {log_entry.strip()}{enrichment_ctx}",
+        "prompt": f"{SYSTEM_PROMPT}\n\nLOG DATA: {log_entry.strip()}{enrichment_ctx}{correlation_ctx}",
         "stream": False,
     }
 
@@ -223,6 +235,14 @@ def analyze_log(log_entry: str, max_retries: int = 1) -> dict:
                 alert["mitre_url"] = mitre["mitre_url"]
                 # Attach enrichment data
                 alert["enrichment"] = enrichment_data
+                # Attach correlation data
+                alert["correlation_id"] = pre_corr.get("correlation_id")
+                alert["chain_stage"] = pre_corr.get("chain_stage")
+                alert["is_correlated"] = pre_corr.get("is_correlated", False)
+                alert["correlation_narrative"] = pre_corr.get("narrative", "")
+                # Escalate severity if correlator flags it
+                if pre_corr.get("escalated_severity"):
+                    alert["threat_level"] = max(alert["threat_level"], pre_corr["escalated_severity"])
                 return alert
 
             # If parse failed and we have retries left, add stronger instruction

@@ -1,0 +1,73 @@
+From: Netflix Support <account-alert@netf1ix.com>
+Reply-To: support@netf1ix.com
+To: user@example.com
+Subject: Your Netflix account has been suspended due to suspicious activity
+Date: Sun, 29 Mar 2026 22:10:00 +0000
+MIME-Version: 1.0
+Content-Type: multipart/alternative; boundary="----=_Part_netflix"
+Authentication-Results: mx.example.com; spf=fail; dkim=fail; dmarc=fail
+Received: from unknown (unknown [45.33.32.156])
+	by mx.example.com (Postfix) with SMTP id AB9F21;
+	Sun, 29 Mar 2026 22:10:01 +0000
+
+------=_Part_netflix
+Content-Type: text/plain; charset="utf-8"
+
+Dear Netflix Member,
+
+We have detected unauthorized access to your Netflix account from
+an unrecognized device in Moscow, Russia.
+
+For your security, your account has been temporarily suspended.
+To restore access, please verify your identity and update your
+payment information:
+
+http://netf1ix.com/account/verify-identity
+
+If you do not verify within 48 hours, your account will be
+permanently closed and you will lose access to your watch history,
+saved shows, and any remaining subscription credit.
+
+Account Details:
+- Last login: Moscow, Russia (Unknown device)
+- IP Address: 185.220.101.33
+- Date: March 29, 2026 at 9:47 PM UTC
+
+If this was you, you can ignore this email. Otherwise, click
+the link above immediately to secure your account.
+
+Netflix Trust & Safety Team
+
+------=_Part_netflix
+Content-Type: text/html; charset="utf-8"
+
+<html>
+<body style="font-family: Helvetica, Arial, sans-serif; background: #000; color: #fff; padding: 20px;">
+<div style="max-width: 600px; margin: 0 auto;">
+<h1 style="color: #e50914;">NETFLIX</h1>
+<h2>Account Suspended</h2>
+<p>Dear Netflix Member,</p>
+<p>We have detected <strong style="color: #e50914;">unauthorized access</strong> to your
+Netflix account from an unrecognized device in <strong>Moscow, Russia</strong>.</p>
+<p>For your security, your account has been temporarily suspended.</p>
+<p style="text-align: center; margin: 30px 0;">
+<a href="http://netf1ix.com/account/verify-identity"
+   style="background: #e50914; color: white; padding: 14px 40px; text-decoration: none; border-radius: 4px; font-size: 18px;">
+   Verify Your Identity
+</a>
+</p>
+<div style="background: #1a1a1a; padding: 15px; border-radius: 8px; margin: 20px 0;">
+<p style="margin: 5px 0;"><strong>Suspicious Login Details:</strong></p>
+<p style="margin: 5px 0;">Location: Moscow, Russia</p>
+<p style="margin: 5px 0;">IP: 185.220.101.33</p>
+<p style="margin: 5px 0;">Date: March 29, 2026 at 9:47 PM UTC</p>
+</div>
+<p style="color: #e50914;"><strong>You have 48 hours</strong> to verify your account
+before it is permanently closed.</p>
+<hr style="border: 1px solid #333;">
+<p style="font-size: 11px; color: #666;">Netflix Trust & Safety Team</p>
+</div>
+</body>
+</html>
+
+------=_Part_netflix--

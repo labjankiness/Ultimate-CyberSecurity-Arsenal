@@ -49,15 +49,34 @@ def init_db() -> None:
             abuse_confidence_score INTEGER,
             total_reports INTEGER,
             is_known_malicious INTEGER DEFAULT 0,
-            enrichment_source TEXT
+            enrichment_source TEXT,
+            correlation_id TEXT,
+            chain_stage TEXT,
+            is_correlated INTEGER DEFAULT 0
         )
     """)
-    # Backwards-compatible migration: add MITRE columns if they don't exist
+    # Backwards-compatible migration: add columns if they don't exist
     existing = {row[1] for row in conn.execute("PRAGMA table_info(alerts)").fetchall()}
     for col in ["mitre_technique_id", "mitre_technique_name", "mitre_tactic", "mitre_url",
-                 "abuse_confidence_score", "total_reports", "is_known_malicious", "enrichment_source"]:
+                 "abuse_confidence_score", "total_reports", "is_known_malicious", "enrichment_source",
+                 "correlation_id", "chain_stage", "is_correlated"]:
         if col not in existing:
             conn.execute(f"ALTER TABLE alerts ADD COLUMN {col} TEXT")
+
+    # Responses audit trail table
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS responses (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            alert_id INTEGER NOT NULL,
+            action_name TEXT NOT NULL,
+            command TEXT NOT NULL,
+            risk_level TEXT,
+            explanation TEXT,
+            status TEXT DEFAULT 'suggested',
+            timestamp TEXT NOT NULL,
+            FOREIGN KEY (alert_id) REFERENCES alerts(id)
+        )
+    """)
     conn.commit()
     conn.close()
 
@@ -79,8 +98,9 @@ def store_alert(alert: dict) -> int:
         INSERT INTO alerts (raw_log, timestamp, model_used, verdict, threat_level,
                             category, summary, remediation, source_ip, username, command,
                             mitre_technique_id, mitre_technique_name, mitre_tactic, mitre_url,
-                            abuse_confidence_score, total_reports, is_known_malicious, enrichment_source)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                            abuse_confidence_score, total_reports, is_known_malicious, enrichment_source,
+                            correlation_id, chain_stage, is_correlated)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     """, (
         alert.get("raw_log", ""),
         alert.get("timestamp", time.strftime("%Y-%m-%d %H:%M:%S")),
@@ -101,6 +121,9 @@ def store_alert(alert: dict) -> int:
         enrichment.get("total_reports"),
         1 if enrichment.get("is_known_malicious") else 0,
         enrichment.get("summary", ""),
+        alert.get("correlation_id"),
+        alert.get("chain_stage"),
+        1 if alert.get("is_correlated") else 0,
     ))
     conn.commit()
     row_id = cur.lastrowid
@@ -177,16 +200,125 @@ def get_alert_stats() -> dict:
     }
 
 
+def get_incident(correlation_id: str) -> list[dict]:
+    """Retrieve all alerts belonging to a correlated incident.
+
+    Args:
+        correlation_id: The correlation ID grouping related alerts.
+
+    Returns:
+        List of alert dicts in chronological order.
+    """
+    conn = _get_conn()
+    rows = conn.execute(
+        "SELECT * FROM alerts WHERE correlation_id = ? ORDER BY id ASC",
+        (correlation_id,)
+    ).fetchall()
+    conn.close()
+    return [dict(row) for row in rows]
+
+
+def get_incidents() -> list[dict]:
+    """Retrieve all unique correlated incidents with summary info.
+
+    Returns:
+        List of dicts with: correlation_id, alert_count, max_severity,
+        categories, first_seen, last_seen, source_ip.
+    """
+    conn = _get_conn()
+    rows = conn.execute("""
+        SELECT correlation_id,
+               COUNT(*) as alert_count,
+               MAX(threat_level) as max_severity,
+               GROUP_CONCAT(DISTINCT category) as categories,
+               MIN(timestamp) as first_seen,
+               MAX(timestamp) as last_seen,
+               source_ip
+        FROM alerts
+        WHERE is_correlated = 1 AND correlation_id IS NOT NULL
+        GROUP BY correlation_id
+        ORDER BY last_seen DESC
+    """).fetchall()
+    conn.close()
+    return [dict(row) for row in rows]
+
+
+def store_responses(alert_id: int, suggestions: list[dict]) -> list[int]:
+    """Store response suggestions for an alert.
+
+    Args:
+        alert_id: The alert row ID these responses belong to.
+        suggestions: List of suggestion dicts from response_engine.
+
+    Returns:
+        List of inserted response row IDs.
+    """
+    conn = _get_conn()
+    ids = []
+    for s in suggestions:
+        cur = conn.execute("""
+            INSERT INTO responses (alert_id, action_name, command, risk_level, explanation, status, timestamp)
+            VALUES (?, ?, ?, ?, ?, 'suggested', ?)
+        """, (
+            alert_id,
+            s.get("action_name", ""),
+            s.get("command", ""),
+            s.get("risk_level", "safe"),
+            s.get("explanation", ""),
+            time.strftime("%Y-%m-%d %H:%M:%S"),
+        ))
+        ids.append(cur.lastrowid)
+    conn.commit()
+    conn.close()
+    return ids
+
+
+def get_responses(alert_id: int) -> list[dict]:
+    """Retrieve all response suggestions for an alert.
+
+    Args:
+        alert_id: The alert row ID.
+
+    Returns:
+        List of response dicts ordered by ID.
+    """
+    conn = _get_conn()
+    rows = conn.execute(
+        "SELECT * FROM responses WHERE alert_id = ? ORDER BY id ASC",
+        (alert_id,)
+    ).fetchall()
+    conn.close()
+    return [dict(row) for row in rows]
+
+
+def update_response_status(response_id: int, status: str) -> None:
+    """Update the status of a response suggestion.
+
+    Args:
+        response_id: The response row ID.
+        status: New status ('suggested', 'approved', 'executed', 'dismissed').
+    """
+    conn = _get_conn()
+    conn.execute(
+        "UPDATE responses SET status = ? WHERE id = ?",
+        (status, response_id)
+    )
+    conn.commit()
+    conn.close()
+
+
 if __name__ == "__main__":
     init_db()
     conn = _get_conn()
-    schema = conn.execute("PRAGMA table_info(alerts)").fetchall()
-    print("=== soc_alerts.db schema ===")
-    print(f"{'Column':<16} {'Type':<12} {'Nullable':<10} {'PK'}")
-    print("-" * 50)
-    for col in schema:
-        nullable = "YES" if not col["notnull"] else "NO"
-        pk = "PK" if col["pk"] else ""
-        print(f"{col['name']:<16} {col['type']:<12} {nullable:<10} {pk}")
+    for table in ["alerts", "responses"]:
+        schema = conn.execute(f"PRAGMA table_info({table})").fetchall()
+        print(f"=== {table} table ===")
+        print(f"{'Column':<20} {'Type':<12} {'Nullable':<10} {'PK'}")
+        print("-" * 54)
+        for col in schema:
+            nullable = "YES" if not col["notnull"] else "NO"
+            pk = "PK" if col["pk"] else ""
+            print(f"{col['name']:<20} {col['type']:<12} {nullable:<10} {pk}")
+        print()
     conn.close()
-    print("\nDatabase initialized successfully.")
+    print("Database initialized successfully.")
