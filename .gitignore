@@ -1,2 +1,12 @@
 __pycache__/
 *.pyc
+*.db
+flows.csv
+flows.json
+benchmark_results.json
+BENCHMARK.md
+mock_security.log
+threat_dashboard.md
+.env
+target/
+Cargo.lock
