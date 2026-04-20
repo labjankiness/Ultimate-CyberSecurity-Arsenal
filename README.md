@@ -1,74 +1,58 @@
-# Cybersecurity Portfolio
+# Ultimate CyberSecurity Arsenal
 
-A collection of cybersecurity tools and projects demonstrating offensive security concepts, network analysis, AI-driven threat detection, and defensive security.
+A comprehensive collection of 16 cybersecurity tools and resources spanning AI-driven threat detection, network security, offensive tooling, defensive hardening, and CTF research.
 
 ## Projects
 
-### Local-AI-SOC
-An AI-powered Security Operations Center that uses locally-hosted LLMs (Ollama + Llama 3.1) to triage SIEM alerts in real-time. Features **structured JSON output**, **SQLite persistence**, **MITRE ATT&CK mapping**, **threat intelligence enrichment**, **alert correlation engine** (kill chain detection, brute force grouping, frequency anomaly), **automated response suggestions**, and a **Streamlit analytics dashboard** with Incidents tab, response playbooks, and MITRE heatmaps. Includes an advanced attack simulator with 27 attack types across all MITRE tactics.
+### AI & Threat Intelligence
 
-**Tech:** Python, Ollama, Llama 3.1 8B, SQLite, Streamlit, Plotly
+| Project | Description | Tech |
+|---------|-------------|------|
+| [Local-AI-SOC](Local-AI-SOC/) | AI-powered Security Operations Center with real-time SIEM alert triage, MITRE ATT&CK mapping, alert correlation, and Streamlit dashboard | Python, Ollama, Llama 3.1, SQLite, Streamlit |
+| [AI-Phishing-Sentinel](AI-Phishing-Sentinel/) | AI-powered phishing and social engineering detection with batch CSV processing and structured JSON reports | Python, Ollama, Llama 3 |
+| [Phishing-Email-Analyzer](Phishing-Email-Analyzer/) | Email header validation (SPF/DKIM/DMARC), URL reputation scanning, homograph attack detection, and LLM content analysis | Python, Ollama |
+| [Guardian-Log-Analyzer](Guardian-Log-Analyzer/) | AI-powered security log parser with SSH auth log analysis, SQLite persistence, and JSON export | Python, Ollama, Llama 2, SQLite |
 
-**Key files:**
-- `triage_agent.py` — LLM orchestration with structured JSON, validation, correlation context injection
-- `correlator.py` — Alert correlation engine (sliding window, kill chain, brute force, frequency anomaly)
-- `response_engine.py` — Automated response suggestions mapped to attack categories with severity escalation
-- `database.py` — SQLite backend with alerts, responses, MITRE, enrichment, and correlation columns
-- `soc_dashboard.py` — Streamlit dashboard (Alerts + Incidents tabs, response suggestion cards)
-- `simulate_attack.py` — Advanced attack simulator (27 types, 3 attack chains, configurable rates)
-- `mitre_mapping.py` — Local MITRE ATT&CK technique lookup
-- `threat_intel.py` — Threat intelligence enrichment (AbuseIPDB + local feed)
-- `log_watcher.py` — Real-time log monitor with correlation and response output
+### Network Security
 
-### Phishing Email Analyzer
-An AI-powered phishing detection tool combining email header validation (SPF/DKIM/DMARC), URL reputation scanning with homograph attack detection, and LLM-based content analysis. Produces colored terminal reports with risk scores and MITRE ATT&CK mapping. Includes 6 sample .eml files (2 legitimate, 4 phishing) and an offline heuristic fallback.
+| Project | Description | Tech |
+|---------|-------------|------|
+| [Network-Anomaly-Detector](Network-Anomaly-Detector/) | Statistical anomaly detection for network traffic using z-scores — detects port scans, C2 beaconing, DNS tunneling, and lateral movement | Python, pandas, Streamlit, SQLite |
+| [IoT-Network-Honeypot](IoT-Network-Honeypot/) | Lightweight IoT honeypot monitoring attacks on common ports (80, 8080, 554, 23) with Streamlit visualization dashboard | Python, SQLite, Streamlit |
+| [Honeypot](Honeypot/) | Fake SSH server capturing credentials, client banners, and commands with IP geolocation and attacker analytics | Python, socket, SQLite, Streamlit |
+| [Network-Monitor](Network-Monitor/) | Real-time network traffic visualization with Flask backend | Python, Flask, psutil |
+| [packet-sniffer](packet-sniffer/) | CLI network packet sniffer — captures and parses TCP, UDP, ICMP, ARP, IPv4, IPv6 with protocol filtering and hex dump | Rust, pnet, clap |
 
-**Tech:** Python, Ollama, email module, requests
+### Offensive Tools
 
-### SSH Honeypot with Analytics
-A fake SSH server that captures connection attempts, credentials, and attacker commands. Features IP geolocation, credential reuse detection, automated attack pattern analysis, rate limiting, and a Streamlit real-time analytics dashboard with country charts, heatmaps, and attacker drill-down.
+| Project | Description | Tech |
+|---------|-------------|------|
+| Port Scanner Suite ([C](Port%20Scanner%20(C)/), [Go](Port%20Scanner%20(Go-Golang)/), [Python](Port%20Scanner%20(Python)/), [Rust](Port%20Scanner%20(Rust)/)) | Concurrent TCP port scanner in 4 languages comparing concurrency models and performance | C, Go, Python, Rust |
+| [Port-Scanner-Benchmark](Port-Scanner-Benchmark/) | Cross-language benchmark tool — auto-compiles and compares all 4 scanner implementations | Python |
+| [password-cracker](password-cracker/) | Dictionary + brute-force password cracker with rule-based mutations (leet speak, capitalization) supporting MD5/SHA1/SHA256/SHA512 | Python |
 
-**Tech:** Python, socket, threading, SQLite, Streamlit, Plotly
+### Defensive Tools
 
-### Network Traffic Anomaly Detector
-A statistical anomaly detection engine for network traffic. Builds behavioral baselines using z-scores and flags deviations without machine learning. Detects port scans, C2 beaconing, data exfiltration, DNS tunneling, and lateral movement. Includes traffic simulator with labeled anomalies and Streamlit dashboard.
+| Project | Description | Tech |
+|---------|-------------|------|
+| [Linux-Hardening-Basics](Linux-Hardening-Basics/) | Automated Ubuntu/Debian hardening script — UFW firewall, Fail2Ban, SSH hardening, debloating, with audit mode | Bash |
+| [keylogger-detector](keylogger-detector/) | Linux security scanner with 8 detection checks for keyloggers including process signatures, LD_PRELOAD hijacking, and kernel modules | Python |
 
-**Tech:** Python, pandas, Streamlit, Plotly, SQLite
+### Research & Education
 
-### Port Scanner Suite
-The same concurrent TCP port scanner implemented in **4 languages** to compare concurrency models, performance, and developer experience:
+| Project | Description | Tech |
+|---------|-------------|------|
+| [CTF-Writeups-and-Security-Research](CTF-Writeups-and-Security-Research/) | Documented CTF challenge solutions and security research across Web, Forensics, Pwn, and Crypto categories | Markdown |
 
-| Language | Concurrency Model | Key Feature |
-|----------|-------------------|-------------|
-| **Python** | ThreadPoolExecutor | Comma-separated port lists, banner grabbing |
-| **C** | pthreads + select() | Nonblocking sockets, minimal overhead |
-| **Go** | Goroutines + channels | Worker pool, dual-phase banner detection |
-| **Rust** | tokio async + Semaphore | Zero-cost abstractions, memory safety |
+## Project Count: 16
 
-### Port Scanner Benchmark Suite
-Cross-language benchmark tool that auto-compiles and runs all 4 port scanner implementations, measures scan time across multiple runs, and generates comparative analysis reports with tradeoff discussion.
-
-**Tech:** Python (subprocess, time, statistics)
-
-### Packet Sniffer (Rust)
-A CLI network packet sniffer built in Rust using the `pnet` crate. Captures and parses TCP, UDP, ICMP, ARP, IPv4, and IPv6 packets with protocol/port filtering, hex dump mode, color-coded output, and packet count limits.
-
-**Tech:** Rust, pnet, clap, chrono, colored
-
-### Password Cracker (Python)
-An educational password cracking tool supporting dictionary attacks and brute-force with rule-based mutations (leet speak, capitalization, number/symbol append). Supports MD5, SHA1, SHA256, SHA512.
-
-### Keylogger Detector (Python)
-A Linux security scanner with 8 detection checks for keyloggers including process signatures, LD_PRELOAD hijacking, kernel modules, and persistence mechanisms.
-
-## Project Count: 10
-
-| Category | Projects |
-|----------|----------|
-| AI-Powered Security | AI-SOC, Phishing Analyzer |
-| Network Security | Packet Sniffer, Anomaly Detector, Honeypot |
-| Offensive Tools | Port Scanners (4 langs), Password Cracker, Benchmark Suite |
-| Defensive Tools | Keylogger Detector |
+| Category | Count | Projects |
+|----------|-------|----------|
+| AI & Threat Intelligence | 4 | AI-SOC, AI-Phishing-Sentinel, Phishing Analyzer, Guardian Log Analyzer |
+| Network Security | 5 | Anomaly Detector, IoT Honeypot, SSH Honeypot, Network Monitor, Packet Sniffer |
+| Offensive Tools | 3 | Port Scanner Suite (4 langs), Benchmark Suite, Password Cracker |
+| Defensive Tools | 2 | Linux Hardening, Keylogger Detector |
+| Research & Education | 1 | CTF Writeups |
 
 ## License
 

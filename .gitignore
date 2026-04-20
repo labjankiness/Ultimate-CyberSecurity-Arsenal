@@ -10,3 +10,6 @@ threat_dashboard.md
 .env
 target/
 Cargo.lock
+venv/
+node_modules/
+*.log
